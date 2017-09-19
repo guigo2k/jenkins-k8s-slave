@@ -18,9 +18,11 @@ node {
           "ORG=${org}",
           "PR=${pr}"
         ]) {
-          steps.sh "echo \$REPO",
-          steps.sh "echo \$ORG",
-          steps.sh "echo \$PR"
+          sh """
+          echo $REPO
+          echo $ORG
+          echo $PR
+          """
         }
     }
 }
