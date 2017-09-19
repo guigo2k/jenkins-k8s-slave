@@ -10,18 +10,17 @@ node {
     stage("Parse GitHub payload") {
         def payload = new JsonSlurperClassic().parseText(env.payload)
         def org = payload?.repository?.full_name.tokenize('/')[0]
+        def branch = payload?.repository?.default_branch
         def repo = payload?.repository?.name
         def pr = payload?.number
 
         withEnv([
           "REPO=${repo}",
-          "ORG=${org}",
-          "PR=${pr}"
+          "BRANCH=${branch}"
         ]) {
           sh """
           echo $REPO
-          echo $ORG
-          echo $PR
+          echo $BRANCH
           """
         }
     }
