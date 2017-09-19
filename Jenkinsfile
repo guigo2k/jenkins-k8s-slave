@@ -15,13 +15,18 @@ node {
         def pr = payload?.number
 
         withEnv([
-          "REPO=${repo}",
-          "BRANCH=${branch}"
+          "SALT_HOME=/srv",
+          "SALT_BRANCH=${branch}",
+          "PODBUILDER_HOME=/data/boto",
+          "PODBUILDER_BRANCH=master",
+          "PUBLISH_PORT=4505",
+          "MASTER_PORT=4506",
+          "API_PORT=4507"
         ]) {
-          sh """
-          echo $REPO
-          echo $BRANCH
-          """
+          sh '''
+          docker-compose up -d jenkins-slave && sleep 15
+          docker-compose exec jenkins-slave env
+          '''
         }
     }
 }

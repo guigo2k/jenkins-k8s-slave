@@ -1,0 +1,17 @@
+version: "3"
+services:
+
+  jenkins-slave:
+    image: guigo2k/jenkins-k8s-slave
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /data/auth:/data/auth
+    environment:
+      - SALT_HOME=${SALT_HOME}
+      - SALT_BRANCH=${SALT_BRANCH}
+      - PODBUILDER_HOME=${PODBUILDER_HOME}
+      - PODBUILDER_BRANCH=${PODBUILDER_BRANCH}
+      - MASTER_PORT=${MASTER_PORT}
+      - PUBLISH_PORT=${PUBLISH_PORT}
+      - API_PORT=${API_PORT}
