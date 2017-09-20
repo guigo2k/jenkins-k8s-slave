@@ -14,24 +14,35 @@ ENV PATH ${PATH}:${GOROOT}/bin:${GOPATH}/bin
 USER root
 
 # Install docker-compose
-RUN curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-RUN chmod +x /usr/local/bin/docker-compose
-RUN docker-compose --version
+RUN curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose && \
+    docker-compose --version
+
+# Install aws-cli
+ENV PYTHONIOENCODING=UTF-8
+RUN apt-get install -y \
+    less \
+    man \
+    ssh \
+    vim \
+    python \
+    python-pip && \
+    pip install awscli
 
 # Install google-cloud-sdk and Go
-RUN apt-get update -y
-RUN apt-get install -y jq golang git make
-RUN curl https://sdk.cloud.google.com | bash && mv google-cloud-sdk /opt
-RUN gcloud components install kubectl
+RUN apt-get update -y && \
+    apt-get install -y jq golang git make && \
+    curl https://sdk.cloud.google.com | bash && mv google-cloud-sdk /opt && \
+    gcloud components install kubectl
 
 # Install Helm
-RUN wget http://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz -P /tmp
-RUN tar -zxvf /tmp/helm-${HELM_VERSION}-linux-amd64.tar.gz -C /tmp && mv /tmp/linux-amd64/helm /bin/helm && rm -rf /tmp
+RUN wget http://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz -P /tmp && \
+    tar -zxvf /tmp/helm-${HELM_VERSION}-linux-amd64.tar.gz -C /tmp && mv /tmp/linux-amd64/helm /bin/helm && rm -rf /tmp
 
 # Install Glide
-RUN mkdir -p ${GOBIN}
-RUN mkdir /tmp
-RUN curl https://glide.sh/get | sh
+RUN mkdir -p ${GOBIN} && \
+    mkdir /tmp && \
+    curl https://glide.sh/get | sh
 
 # Install Landscape
 WORKDIR ${GOPATH}
