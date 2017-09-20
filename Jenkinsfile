@@ -25,7 +25,7 @@ node {
         ]) {
           sh '''
           env
-          #while true; do sleep 10; done
+          while true; do sleep 10; done
           #docker-compose up -d jenkins-slave && sleep 15
           #docker-compose exec jenkins-slave env
           '''
