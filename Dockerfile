@@ -18,9 +18,10 @@ RUN curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSIO
     chmod +x /usr/local/bin/docker-compose && \
     docker-compose --version
 
-# Install aws-cli
+# Install aws-cli and Python
 ENV PYTHONIOENCODING=UTF-8
-RUN apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
     less \
     man \
     ssh \
