@@ -8,14 +8,10 @@ Image hosted at [Dockerhub](https://hub.docker.com/r/lushdigital/jenkins-k8s-sla
 
 Includes:
 
-* google-cloud-sdk - Used to access Google Compute Engine, Google Cloud Storage, Google BigQuery, and other gcp products and services from the command-line.
-
-* kubectl -  Command line interface for running commands against Kubernetes clusters.
-
-* golang - Go
-
-* glide - Package manager for Go.
-
-* Helm - Package manager for Kubernetes.
-
-* Landscaper - Takes a set of Helm Chart references with values (a desired state), and realizes this in a Kubernetes cluster.
+* [google-cloud-sdk](https://cloud.google.com/sdk/)
+* [kubectl](https://kubernetes.io/docs/user-guide/kubectl/)
+* [golang](https://golang.org/)
+* [glide](https://glide.sh/)
+* [Helm](https://helm.sh/)
+* [Landscaper](https://github.com/Eneco/landscaper)
+* [docker-compose](https://docs.docker.com/compose/)
