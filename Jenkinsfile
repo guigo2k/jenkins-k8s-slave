@@ -20,7 +20,7 @@ node {
         ln -sf /data/auth/.aws /root/.aws
 
         # Login to AWS ECR registry
-        $(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)
+        \$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)
         """
     }
     stage("Salt checkout") {
