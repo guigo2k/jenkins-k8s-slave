@@ -1,57 +1,59 @@
+/**
+ * Symphony.com Jenkins pipeline job
+ */
+
 import groovy.json.JsonSlurperClassic
 
 node {
-    def payload = new JsonSlurperClassic().parseText(env.payload)
-    def org = payload?.repository?.full_name.tokenize('/')[0]
-    def branch = payload?.repository?.default_branch
-    def repo = payload?.repository?.name
-    def pr = payload?.number
+  def payload = new JsonSlurperClassic().parseText(env.payload)
+  def org = payload?.repository?.full_name.tokenize('/')[0]
+  def branch = payload?.repository?.default_branch
+  def repo = payload?.repository?.name
+  def pr = payload?.number
 
-    stage("Credentials") {
-        sh """
-        # Get Symphony credentials
-        gcloud components update
-        gsutil cp gs://sym-esa-kube/auth.tgz .
-        tar -xzvf auth.tgz
-        mkdir /data && mv ./auth /data
+  environment {
+    SALT_HOME=/srv
+    SALT_BRANCH=${branch}
+    PODBUILDER_HOME=/data/boto
+    PODBUILDER_BRANCH=master
+    PUBLISH_PORT=4505
+    MASTER_PORT=4506
+    API_PORT=4507
+    AUTH_PATH=/opt/auth
+    COMPOSE_PROJECT_NAME=lorem
+  }
 
-        # Create credentials links
-        ln -sf /data/auth/.ssh /root/.ssh
-        ln -sf /data/auth/.aws /root/.aws
+  stage("Credentials") {
+    sh '''
+    # Get Symphony credentials
+    if [[ ! -d ${PWD}/auth ]]; then
+      gsutil cp gs://sym-esa-kube/auth.tgz .
+      tar -xzvf auth.tgz && mv ./auth /opt
+    fi
 
-        # Login to AWS ECR registry
-        \$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)
-        """
-    }
-    stage("Checkout") {
-        sh """
-        cd /srv
-        git init
-        git config core.sshCommand 'ssh -i /root/.ssh/devops-salt-deploy-key -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
-        git remote add origin git@github.com:SymphonyOSF/DevOps-Salt.git
-        git fetch origin
-        git checkout ${branch}
-        """
-    }
-    stage("Containers") {
-        withEnv([
-          "SALT_HOME=/srv",
-          "SALT_BRANCH=${branch}",
-          "PODBUILDER_HOME=/data/boto",
-          "PODBUILDER_BRANCH=master",
-          "PUBLISH_PORT=4505",
-          "MASTER_PORT=4506",
-          "API_PORT=4507"
-        ]) {
-          sh '''
-          cd /srv/images
+    # Create credentials links
+    ln -sf /opt/auth/.ssh /root/.ssh
+    ln -sf /opt/auth/.aws /root/.aws
 
-          while true; do sleep 60; done
-          
-          docker-compose up -d --scale saltminion=4 saltmaster saltminion
-          sleep 20
-          docker-compose exec saltmaster salt '*' grains.items
-          '''
-        }
-    }
+    # Login to AWS ECR registry
+    \$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)
+    '''
+  }
+  stage("Checkout") {
+    sh '''
+    cd /srv
+    git init
+    git config core.sshCommand 'ssh -i /root/.ssh/devops-salt-deploy-key -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
+    git remote add origin git@github.com:SymphonyOSF/DevOps-Salt.git
+    git fetch origin
+    git checkout ${branch}
+    '''
+  }
+  stage("Containers") {
+    sh '''
+    cd /srv/images
+    docker-compose up -d --scale saltminion=4 saltmaster saltminion && sleep 30
+    docker-compose exec saltmaster salt '*' grains.items
+    '''
+  }
 }
