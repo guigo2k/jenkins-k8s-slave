@@ -22,9 +22,9 @@ node {
   stage("Credentials") {
     sh """
     # Get Symphony credentials
-    if [[ ! -d '/opt/symphony/auth' ]]; then
+    if [[ ! -d '/tmp/auth' ]]; then
       gsutil cp gs://sym-esa-kube/auth.tgz .
-      tar -xzvf auth.tgz && mv ./auth /opt/symphony
+      tar -xzvf auth.tgz && mv ./auth /tmp
     fi
 
     # Create credentials links
