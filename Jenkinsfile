@@ -13,16 +13,15 @@ node {
   def repo = payload?.repository?.name
   def pr = payload?.number
 
-  def lorem = env.HOSTNAME
-
   // Define environment vars
   env.AUTH_PATH = '/tmp/auth'
-  env.COMPOSE_PROJECT_NAME = env.HOSTNAME
+  env.COMPOSE_PROJECT_NAME = 'env.HOSTNAME'
 
   println ${lorem}
 
   stage("Credentials") {
     sh """
+    echo "COMPOSE_PROJECT_NAME = \$COMPOSE_PROJECT_NAME"
     # Get Symphony credentials
     if [[ ! -d '/tmp/auth' ]]; then
       gsutil cp gs://sym-esa-kube/auth.tgz .
