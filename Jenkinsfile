@@ -6,18 +6,17 @@ import groovy.json.JsonSlurperClassic
 
 node {
 
+  // Parse GitHub payload
   def payload = new JsonSlurperClassic().parseText(env.payload)
   def org = payload?.repository?.full_name.tokenize('/')[0]
   def branch = payload?.repository?.default_branch
   def repo = payload?.repository?.name
   def pr = payload?.number
+  def commit = payload?.commits[0]?.id.
 
+  // Define environment vars
   env.AUTH_PATH = '/tmp/auth'
-  // env.COMPOSE_PROJECT_NAME=lorem
-  // env.PODBUILDER_BRANCH=master
-  // env.PODBUILDER_HOME=/data/boto
-  // env.SALT_BRANCH=${branch}
-  // env.SALT_HOME=/srv
+  env.COMPOSE_PROJECT_NAME = '${commit}'
 
   stage("Credentials") {
     sh """
