@@ -9,14 +9,17 @@ node {
   // Parse GitHub payload
   def payload = new JsonSlurperClassic().parseText(env.payload)
   def org = payload?.repository?.full_name.tokenize('/')[0]
-  def commit = payload?.commits[0]?.id.substring(0,7)
   def branch = payload?.repository?.default_branch
   def repo = payload?.repository?.name
   def pr = payload?.number
 
+  def lorem = env.HOSTNAME
+
   // Define environment vars
   env.AUTH_PATH = '/tmp/auth'
-  env.COMPOSE_PROJECT_NAME = '${commit}'
+  env.COMPOSE_PROJECT_NAME = env.HOSTNAME
+
+  println ${lorem}
 
   stage("Credentials") {
     sh """
