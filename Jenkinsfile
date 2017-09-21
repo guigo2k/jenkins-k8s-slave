@@ -17,8 +17,6 @@ node {
   env.AUTH_PATH = '/tmp/auth'
   env.COMPOSE_PROJECT_NAME = 'env.HOSTNAME'
 
-  println ${lorem}
-
   stage("Credentials") {
     sh """
     echo "COMPOSE_PROJECT_NAME = \$COMPOSE_PROJECT_NAME"
