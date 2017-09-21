@@ -28,8 +28,8 @@ node {
     fi
 
     # Create credentials links
-    ln -sf /opt/auth/.ssh /root/.ssh
-    ln -sf /opt/auth/.aws /root/.aws
+    ln -sf /tmp/auth/.ssh /root/.ssh
+    ln -sf /tmp/auth/.aws /root/.aws
 
     # Login to AWS ECR registry
     \$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)
