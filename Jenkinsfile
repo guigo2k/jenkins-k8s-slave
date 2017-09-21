@@ -12,6 +12,13 @@ node {
   def repo = payload?.repository?.name
   def pr = payload?.number
 
+  // env.AUTH_PATH=/opt/auth
+  // env.COMPOSE_PROJECT_NAME=lorem
+  // env.PODBUILDER_BRANCH=master
+  // env.PODBUILDER_HOME=/data/boto
+  // env.SALT_BRANCH=${branch}
+  // env.SALT_HOME=/srv
+
   stage("Credentials") {
     sh """
     # Get Symphony credentials
@@ -26,6 +33,7 @@ node {
     \$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)
     """
   }
+
   stage("Checkout") {
     sh """
     cd /srv
@@ -36,6 +44,7 @@ node {
     git checkout ${branch}
     """
   }
+
   stage("Containers") {
     sh """
     cd /srv/images
