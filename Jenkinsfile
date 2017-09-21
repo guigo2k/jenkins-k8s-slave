@@ -51,7 +51,7 @@ node {
     sh """
     cd /srv/images
     docker-compose up -d --scale saltminion=4 saltmaster saltminion && sleep 30
-    docker-compose exec saltmaster salt '*' grains.items
+    docker-compose exec saltmaster salt-key
     """
   }
 }
