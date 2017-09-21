@@ -12,7 +12,7 @@ node {
   def repo = payload?.repository?.name
   def pr = payload?.number
 
-  env.AUTH_PATH=/opt/symphony/auth
+  env.AUTH_PATH=/tmp/auth
   // env.COMPOSE_PROJECT_NAME=lorem
   // env.PODBUILDER_BRANCH=master
   // env.PODBUILDER_HOME=/data/boto
