@@ -27,7 +27,7 @@ pipeline {
   stage("Credentials") {
     sh """
     # Get Symphony credentials
-    if [[ ! -d /opt/auth ]]; then
+    if [ ! -d /opt/auth \]; then
       gsutil cp gs://sym-esa-kube/auth.tgz .
       tar -xzvf auth.tgz && mv ./auth /opt
     fi
