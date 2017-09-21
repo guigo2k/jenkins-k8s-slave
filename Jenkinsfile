@@ -4,7 +4,8 @@
 
 import groovy.json.JsonSlurperClassic
 
-node {
+pipeline {
+
   def payload = new JsonSlurperClassic().parseText(env.payload)
   def org = payload?.repository?.full_name.tokenize('/')[0]
   def branch = payload?.repository?.default_branch
@@ -12,15 +13,15 @@ node {
   def pr = payload?.number
 
   environment {
-    SALT_HOME=/srv
-    SALT_BRANCH=${branch}
-    PODBUILDER_HOME=/data/boto
-    PODBUILDER_BRANCH=master
-    PUBLISH_PORT=4505
-    MASTER_PORT=4506
     API_PORT=4507
     AUTH_PATH=/opt/auth
     COMPOSE_PROJECT_NAME=lorem
+    MASTER_PORT=4506
+    PODBUILDER_BRANCH=master
+    PODBUILDER_HOME=/data/boto
+    PUBLISH_PORT=4505
+    SALT_BRANCH=${branch}
+    SALT_HOME=/srv
   }
 
   stage("Credentials") {
