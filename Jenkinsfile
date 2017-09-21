@@ -12,20 +12,17 @@ node {
   def repo = payload?.repository?.name
   def pr = payload?.number
 
-  env.API_PORT=4507
   env.AUTH_PATH=/opt/auth
   env.COMPOSE_PROJECT_NAME=lorem
-  env.MASTER_PORT=4506
   env.PODBUILDER_BRANCH=master
   env.PODBUILDER_HOME=/data/boto
-  env.PUBLISH_PORT=4505
   env.SALT_BRANCH=${branch}
   env.SALT_HOME=/srv
 
   stage("Credentials") {
     sh """
     # Get Symphony credentials
-    if [ ! -d /opt/auth ]; then
+    if ! -d /opt/auth; then
       gsutil cp gs://sym-esa-kube/auth.tgz .
       tar -xzvf auth.tgz && mv ./auth /opt
     fi
