@@ -12,13 +12,6 @@ node {
   def repo = payload?.repository?.name
   def pr = payload?.number
 
-  env.AUTH_PATH=/opt/auth
-  env.COMPOSE_PROJECT_NAME=lorem
-  env.PODBUILDER_BRANCH=master
-  env.PODBUILDER_HOME=/data/boto
-  env.SALT_BRANCH=${branch}
-  env.SALT_HOME=/srv
-
   stage("Credentials") {
     sh """
     # Get Symphony credentials
