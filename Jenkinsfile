@@ -15,7 +15,7 @@ node {
 
   // Define environment vars
   env.AUTH_PATH = '/tmp/auth'
-  env.COMPOSE_PROJECT_NAME = 'env.HOSTNAME'
+  env.COMPOSE_PROJECT_NAME = env.HOSTNAME
 
   stage("Credentials") {
     sh """
