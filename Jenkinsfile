@@ -12,7 +12,7 @@ node {
   def repo = payload?.repository?.name
   def pr = payload?.number
 
-  // env.AUTH_PATH=/opt/auth
+  env.AUTH_PATH=/opt/symphony/auth
   // env.COMPOSE_PROJECT_NAME=lorem
   // env.PODBUILDER_BRANCH=master
   // env.PODBUILDER_HOME=/data/boto
@@ -22,8 +22,10 @@ node {
   stage("Credentials") {
     sh """
     # Get Symphony credentials
-    gsutil cp gs://sym-esa-kube/auth.tgz .
-    tar -xzvf auth.tgz && mv ./auth /opt
+    if [[ ! -d '/opt/symphony/auth' ]]; then
+      gsutil cp gs://sym-esa-kube/auth.tgz .
+      tar -xzvf auth.tgz && mv ./auth /opt/symphony
+    fi
 
     # Create credentials links
     ln -sf /opt/auth/.ssh /root/.ssh
