@@ -50,8 +50,8 @@ node {
   stage("Containers") {
     sh """
     cd /srv/images
-    sudo docker-compose up -d --scale saltminion=4 saltmaster saltminion && sleep 30
-    sudo docker-compose exec saltmaster salt-key
+    docker-compose up -d --scale saltminion=4 saltmaster saltminion && sleep 30
+    docker-compose exec saltmaster salt-key
     while true; do sleep 30; done
     """
   }
