@@ -45,12 +45,9 @@ node {
         ]) {
           sh '''
           cd /srv/images
-
-          while true; do sleep 60; done
-
-          docker-compose up -d saltmaster saltminion && sleep 15
-          docker-compose scale saltminion=4
-          docker-compose exec saltmaster salt '*' grains.items saltenv=dev
+          docker-compose up -d --scale saltminion=4 saltmaster saltminion
+          sleep 20
+          docker-compose exec saltmaster salt '*' grains.items
           '''
         }
     }
