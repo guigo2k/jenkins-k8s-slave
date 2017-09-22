@@ -42,7 +42,7 @@ node {
     git config core.sshCommand 'ssh -i /root/.ssh/devops-salt-deploy-key -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
     git remote add origin git@github.com:SymphonyOSF/DevOps-Salt.git
     git fetch origin
-    git che ckout ${branch}
+    git checkout ${branch}
     """
   }
 
@@ -52,7 +52,7 @@ node {
     docker-compose up -d --scale saltminion=4 saltmaster saltminion
 
     echo -ne "\nWaiting Saltmaster..."
-    while ! $(docker-compose exec saltmaster ps auxf | grep /usr/sbin/init); do
+    while ! \$(docker-compose exec -T saltmaster ps auxf | grep /usr/sbin/init); do
       echo -ne "."; sleep 2;
     done
 
