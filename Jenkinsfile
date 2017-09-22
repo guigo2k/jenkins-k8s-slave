@@ -19,7 +19,6 @@ node {
 
   stage("Credentials") {
     sh """
-    echo "COMPOSE_PROJECT_NAME = \$COMPOSE_PROJECT_NAME"
     # Get credentials
     if [[ ! -d '/tmp/auth' ]]; then
       gsutil cp gs://sym-esa-kube/auth.tgz .
@@ -51,10 +50,7 @@ node {
     cd /srv/images
     docker-compose up -d --scale saltminion=4 saltmaster saltminion
 
-    echo -ne "\nWaiting Saltmaster..."
-    while ! \$(docker-compose exec -T saltmaster ps auxf | grep /usr/sbin/init); do
-      echo -ne "."; sleep 2;
-    done
+    sleep 30
 
     docker-compose exec -T saltmaster salt-key
     """
