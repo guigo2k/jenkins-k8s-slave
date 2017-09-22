@@ -50,9 +50,9 @@ node {
     sh """
     cd /srv/images
     docker-compose up -d --scale saltminion=4 saltmaster saltminion && sleep 30
-
-    while true; do sleep 30; done
     docker-compose exec saltmaster salt-key
+
+    #while true; do sleep 30; done
     """
   }
 }
