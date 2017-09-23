@@ -51,7 +51,7 @@ node {
       dir ('/srv/images') {
         sh """
         docker-compose pull saltmaster saltminion
-        docker-compose up -d --scale saltminion=4 saltmaster saltminion
+        docker-compose up -d --no-color --scale saltminion=4 saltmaster saltminion
         """
 
         waitUntil {
@@ -59,7 +59,7 @@ node {
           return (w == 0);
         }
 
-        sleep 7
+        sleep 10
         sh """
         docker-compose exec -T saltmaster salt-key
         docker-compose down
