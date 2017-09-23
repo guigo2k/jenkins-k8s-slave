@@ -47,10 +47,6 @@ node {
 
   stage("Containers") {
     sh """
-    # Set ports
-    read PUBLISH_PORT MASTER_PORT API_PORT SSH_PORT <<< $((netstat -atn | awk '{printf "%s\n%s\n", $4, $4}' | grep -oE '[0-9]*$'; seq 32768 61000) | sort -n | uniq -u | head -n 4)
-    export PUBLISH_PORT MASTER_PORT API_PORT SSH_PORT
-
     # Run containers
     cd /srv/images
     docker-compose pull saltmaster saltminion
