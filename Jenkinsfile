@@ -49,10 +49,12 @@ node {
     sh """
     cd /srv/images
     docker-compose up -d --scale saltminion=4 saltmaster saltminion
-
-    sleep 30
-
-    docker-compose exec -T saltmaster salt-key
+    echo "Waiting Saltmaster startup..."
+    until [[ $(docker-compose logs saltmaster | grep 'startup completed') ]]; do
+      sleep 3
+    done && sleep 7
+    docker-compose exec saltmaster salt-key
+    docker-compose down
     """
   }
 }
