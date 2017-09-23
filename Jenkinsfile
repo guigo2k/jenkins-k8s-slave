@@ -17,7 +17,7 @@ node {
   env.AUTH_PATH = '/tmp/auth'
   env.COMPOSE_PROJECT_NAME = env.HOSTNAME
 
-  stage("Credentials") {
+  stage("Credentials Setup") {
     sh """
     # Get credentials
     if [[ ! -d '/tmp/auth' ]]; then
@@ -34,7 +34,7 @@ node {
     """
   }
 
-  stage("Checkout") {
+  stage("Salt Checkout") {
     sh """
     cd /srv
     git init
@@ -45,20 +45,24 @@ node {
     """
   }
 
-  stage("Containers") {
+  stage("Start Containers") {
     sh """
-    # Run containers
     cd /srv/images
     docker-compose pull saltmaster saltminion
     docker-compose up -d --scale saltminion=4 saltmaster saltminion
+    """
+  }
 
-    # Wait Saltmaster startup
-    echo "Waiting Saltmaster startup..."
-    until [[ \$(docker-compose logs saltmaster | grep 'startup completed') ]]; do
-      sleep 3
-    done && sleep 7
+  stage("Saltmaster startup") {
+    waitUntil {
+      def r = sh script: "docker-compose logs saltmaster | grep 'startup completed'", returnStatus: true
+      return (r == 0);
+    }
+  }
 
-    # Get salt-keys
+  stage("Get salt-keys") {
+    sh """
+    sleep 10
     docker-compose exec saltmaster salt-key
     docker-compose down
     """
