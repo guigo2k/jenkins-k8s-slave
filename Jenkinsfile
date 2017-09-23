@@ -48,6 +48,7 @@ node {
   stage("Containers") {
     sh """
     cd /srv/images
+    docker-compose pull saltmaster saltminion
     docker-compose up -d --scale saltminion=4 saltmaster saltminion
     echo "Waiting Saltmaster startup..."
     until [[ \$(docker-compose logs saltmaster | grep 'startup completed') ]]; do
