@@ -35,36 +35,32 @@ node {
   }
 
   stage("Salt Checkout") {
-    sh """
-    cd /srv
-    git init
-    git config core.sshCommand 'ssh -i /root/.ssh/devops-salt-deploy-key -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
-    git remote add origin git@github.com:SymphonyOSF/DevOps-Salt.git
-    git fetch origin
-    git checkout ${branch}
-    """
-  }
-
-  stage("Start Containers") {
-    sh """
-    cd /srv/images
-    docker-compose pull saltmaster saltminion
-    docker-compose up -d --scale saltminion=4 saltmaster saltminion
-    """
-  }
-
-  stage("Saltmaster startup") {
-    waitUntil {
-      def r = sh script: "docker-compose logs saltmaster | grep 'startup completed'", returnStatus: true
-      return (r == 0);
+    dir ('/srv') {
+      sh """
+      git init
+      git config core.sshCommand 'ssh -i /root/.ssh/devops-salt-deploy-key -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
+      git remote add origin git@github.com:SymphonyOSF/DevOps-Salt.git
+      git fetch origin
+      git checkout ${branch}
+      """
     }
   }
 
-  stage("Get salt-keys") {
-    sh """
-    sleep 10
-    docker-compose exec saltmaster salt-key
-    docker-compose down
-    """
+  stage("Start Containers") {
+    dir ('/srv/images') {
+      sh """
+      docker-compose pull saltmaster saltminion
+      docker-compose up -d --scale saltminion=4 saltmaster saltminion
+      """
+      waitUntil {
+        def r = sh script: "docker-compose logs saltmaster | grep 'startup completed'", returnStatus: true
+        return (r == 0);
+      }
+      sh """
+      sleep 7
+      docker-compose exec saltmaster salt-key
+      docker-compose down
+      """
+    }
   }
 }
