@@ -78,7 +78,10 @@ node {
   finally {
     stage("Tear Down") {
       dir('/srv/images') {
-        sh "docker-compose down"
+        def compose = fileExists 'docker-compose.yml'
+        if (compose) {
+          sh "docker-compose down"
+        }
       }
     }
   }
