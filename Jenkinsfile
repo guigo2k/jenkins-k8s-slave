@@ -65,6 +65,14 @@ node {
 
         sh """
         docker-compose exec -T saltmaster salt-key
+        docker-compose exec -T saltmaster bash -c "\
+source /root/.bash_profile && \
+cd /srv/tests && \
+salt -l quiet '*' test.ping && \
+export WHITELIST_TESTS=tests.unit.test_state_syntax.SaltWhitelistSyntaxTests && \
+export APPLY_TESTS=tests.unit.test_state_syntax.SaltApplyTests && \
+export IS_PR=${IS_PR}
+nosetests --verbose --nocapture --nologcapture --processes=4 --process-timeout=3600 --exclude-test=\${WHITELIST_TESTS} --exclude-test=\${APPLY_TESTS} unit/test_state_syntax.py"
         """
       }
     }
