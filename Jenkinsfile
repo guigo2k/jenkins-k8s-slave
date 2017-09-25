@@ -19,20 +19,23 @@ node {
 
   try {
     stage("Credentials Setup") {
-      sh """
-      # Get credentials
-      if [[ ! -d '/tmp/auth' ]]; then
-        gsutil cp gs://sym-esa-kube/auth.tgz .
-        tar -xzvf auth.tgz && mv ./auth /tmp
-      fi
+      dir('/tmp') {
 
-      # Link credentials
-      ln -sf /tmp/auth/.ssh /root/.ssh
-      ln -sf /tmp/auth/.aws /root/.aws
+        def auth_dir = '/tmp/auth'
 
-      # Login to AWS ECR registry
-      \$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)
-      """
+        // If folder doesn't exist
+        if( !auth_dir.exists() ) {
+          sh """
+          gsutil cp gs://sym-esa-kube/auth.tgz .
+          tar -xzvf auth.tgz && rm -f auth.tgz
+          ln -sf /tmp/auth/.ssh /root/.ssh
+          ln -sf /tmp/auth/.aws /root/.aws
+          """
+        }
+      }
+
+      // Login to AWS ECR registry
+      sh "\$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)"
     }
 
     stage("Salt Checkout") {
