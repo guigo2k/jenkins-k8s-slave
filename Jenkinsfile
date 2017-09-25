@@ -59,10 +59,10 @@ node {
           return (w == 0);
         }
 
-        sleep 10
+        sleep 7
+
         sh """
         docker-compose exec -T saltmaster salt-key
-        docker-compose down
         """
       }
     }
