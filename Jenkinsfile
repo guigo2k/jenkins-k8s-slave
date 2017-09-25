@@ -13,7 +13,7 @@ node {
   def repo = payload?.repository?.name
   def pr = payload?.number
 
-  // Define environment vars
+  // Set shell environment
   env.AUTH_PATH = '/tmp/auth'
   env.COMPOSE_PROJECT_NAME = env.HOSTNAME
 
@@ -21,21 +21,20 @@ node {
     stage("Credentials Setup") {
       dir('/tmp') {
 
-        def auth_dir = '/tmp/auth'
-
-        // If folder doesn't exist
-        if( !auth_dir.exists() ) {
+        def auth = fileExists '/tmp/auth'
+        if(!auth) {
           sh """
           gsutil cp gs://sym-esa-kube/auth.tgz .
           tar -xzvf auth.tgz && rm -f auth.tgz
-          ln -sf /tmp/auth/.ssh /root/.ssh
-          ln -sf /tmp/auth/.aws /root/.aws
           """
         }
-      }
 
-      // Login to AWS ECR registry
-      sh "\$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)"
+        sh """
+        ln -sf /tmp/auth/.ssh /root/.ssh
+        ln -sf /tmp/auth/.aws /root/.aws
+        \$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)
+        """
+      }
     }
 
     stage("Salt Checkout") {
