@@ -58,6 +58,7 @@ node {
           return (w == 0);
         }
 
+        sleep 5
         sh "docker-compose up -d --scale saltminion=4 saltminion"
         sh "docker-compose exec -T saltmaster salt-key"
       }
