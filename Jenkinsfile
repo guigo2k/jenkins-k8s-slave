@@ -18,10 +18,10 @@ node {
   env.COMPOSE_PROJECT_NAME = env.HOSTNAME
 
   try {
-    stage("Credentials Setup") {
+    stage("Check Credentials") {
       dir('/tmp') {
 
-        def auth = fileExists '/tmp/auth'
+        def auth = fileExists env.AUTH_PATH
         if(!auth) {
           sh """
           gsutil cp gs://sym-esa-kube/auth.tgz .
@@ -37,7 +37,7 @@ node {
       }
     }
 
-    stage("Salt Checkout") {
+    stage("Git Checkout") {
       dir ('/srv') {
         sh """
         git init
@@ -49,23 +49,17 @@ node {
       }
     }
 
-    stage("Start Containers") {
+    stage("Run Containers") {
       dir ('/srv/images') {
-        sh """
-        docker-compose pull saltmaster saltminion
-        docker-compose up -d --no-color --scale saltminion=4 saltmaster saltminion
-        """
+        sh "docker-compose up -d saltmaster"
 
         waitUntil {
           def w = sh script: "docker-compose logs saltmaster | grep 'startup completed'", returnStatus: true
           return (w == 0);
         }
 
-        sleep 7
-
-        sh """
-        docker-compose exec -T saltmaster salt-key
-        """
+        sh "docker-compose up -d --scale saltminion=4 saltminion"
+        sh "docker-compose exec -T saltmaster salt-key"
       }
     }
   }
