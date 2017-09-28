@@ -18,7 +18,7 @@ node {
   env.COMPOSE_PROJECT_NAME = env.HOSTNAME
 
   try {
-    stage("Check Credentials") {
+    stage("Credentials") {
       dir('/tmp') {
 
         def auth = fileExists env.AUTH_PATH
@@ -37,7 +37,7 @@ node {
       }
     }
 
-    stage("Git Checkout") {
+    stage("Checkout") {
       dir ('/srv') {
         sh """
         git init
@@ -49,12 +49,12 @@ node {
       }
     }
 
-    stage("Run Containers") {
+    stage("Start Containers") {
       dir ('/srv/images') {
         sh "docker-compose up -d saltmaster"
 
         waitUntil {
-          def w = sh script: "docker-compose logs saltmaster | grep 'startup completed'", returnStatus: true
+          def w = sh script: "docker-compose logs saltmaster | grep 'Startup completed'", returnStatus: true
           return (w == 0);
         }
 
