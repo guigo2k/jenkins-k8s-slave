@@ -51,6 +51,7 @@ node {
 
     stage("Start Containers") {
       dir ('/srv/images') {
+        sh "docker-compose pull saltmaster saltminion"
         sh "docker-compose up -d saltmaster"
 
         waitUntil {
