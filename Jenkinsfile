@@ -54,9 +54,11 @@ node {
         sh "docker-compose pull saltmaster saltminion"
         sh "docker-compose up -d saltmaster"
 
-        waitUntil {
-          def w = sh script: "docker-compose logs saltmaster | grep 'Startup completed'", returnStatus: true
-          return (w == 0);
+        timeout(240) {
+          waitUntil {
+            def w = sh script: "docker-compose logs saltmaster | grep 'Startup completed'", returnStatus: true
+            return (w == 0);
+          }
         }
 
         sleep 5
