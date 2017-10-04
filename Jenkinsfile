@@ -66,7 +66,14 @@ node {
         sh "docker-compose exec -T saltmaster salt-key"
       }
     }
+
+    stage("Pillar Synthax") {
+      dir ('/srv/tests') {
+        sh "nosetests --verbose --nocapture --nologcapture unit/test_pillar_syntax.py"
+      }
+    }
   }
+
 
   catch(err) {
     echo "Ooops! We found an error:"
