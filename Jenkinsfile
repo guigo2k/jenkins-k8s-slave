@@ -18,7 +18,7 @@ node {
   env.COMPOSE_PROJECT_NAME = env.HOSTNAME
 
   try {
-    stage("Credentials") {
+    stage("Setup") {
       dir('/tmp') {
 
         def auth = fileExists env.AUTH_PATH
@@ -35,9 +35,7 @@ node {
         \$(aws ecr get-login --no-include-email --region us-east-1 --profile symphony-aws-es-sandbox)
         """
       }
-    }
 
-    stage("Checkout") {
       dir ('/srv') {
         sh """
         git init
@@ -47,9 +45,8 @@ node {
         git checkout ${branch}
         """
       }
-    }
 
-    stage("Start Containers") {
+    stage("Docker Start") {
       dir ('/srv/images') {
         sh "docker-compose pull saltmaster saltminion"
         sh "docker-compose up -d saltmaster"
@@ -71,6 +68,18 @@ node {
         sh "docker-compose exec -T saltmaster nosetests --verbose --nocapture --nologcapture /srv/tests/unit/test_pillar_syntax.py"
       }
     }
+
+    stage("State Synthax") {
+      dir ('/srv/images') {
+        sh "docker-compose exec -T saltmaster bash -c \"\
+source /root/.bash_profile && \
+cd /srv/tests && \
+export WHITELIST_TESTS=tests.unit.test_state_syntax.SaltWhitelistSyntaxTests && \
+export APPLY_TESTS=tests.unit.test_state_syntax.SaltApplyTests && \
+nosetests --verbose --nocapture --nologcapture --processes=4 --process-timeout=3600 --exclude-test=\${WHITELIST_TESTS} --exclude-test=\${APPLY_TESTS} unit/test_state_syntax.py\""
+      }
+    }
+
   }
 
 
