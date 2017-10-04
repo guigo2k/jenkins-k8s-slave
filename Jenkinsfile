@@ -45,6 +45,7 @@ node {
         git checkout ${branch}
         """
       }
+    }
 
     stage("Docker Start") {
       dir ('/srv/images') {
@@ -79,9 +80,7 @@ export APPLY_TESTS=tests.unit.test_state_syntax.SaltApplyTests && \
 nosetests --verbose --nocapture --nologcapture --processes=4 --process-timeout=3600 --exclude-test=\${WHITELIST_TESTS} --exclude-test=\${APPLY_TESTS} unit/test_state_syntax.py\""
       }
     }
-
   }
-
 
   catch(err) {
     echo "Ooops! We found an error:"
