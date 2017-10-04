@@ -68,8 +68,8 @@ node {
     }
 
     stage("Pillar Synthax") {
-      dir ('/srv/tests') {
-        sh "nosetests --verbose --nocapture --nologcapture unit/test_pillar_syntax.py"
+      dir ('/srv/images') {
+        sh "docker-compose exec -T saltmaster cd /srv/tests && nosetests --verbose --nocapture --nologcapture unit/test_pillar_syntax.py"
       }
     }
   }
