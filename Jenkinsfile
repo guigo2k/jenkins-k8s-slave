@@ -61,15 +61,14 @@ node {
           }
         }
 
-        sleep 5
-        sh "docker-compose up -d --scale saltminion=4 saltminion"
+        sh "docker-compose up -d --scale saltminion=4 saltminion"; sleep 5
         sh "docker-compose exec -T saltmaster salt-key"
       }
     }
 
     stage("Pillar Synthax") {
       dir ('/srv/images') {
-        sh "docker-compose exec -T saltmaster 'cd /srv/tests && nosetests --verbose --nocapture --nologcapture unit/test_pillar_syntax.py'"
+        sh "docker-compose exec -T saltmaster nosetests --verbose --nocapture --nologcapture /srv/tests/unit/test_pillar_syntax.py"
       }
     }
   }
