@@ -47,7 +47,7 @@ node {
       }
     }
 
-    stage("Docker Start") {
+    stage("Containers") {
       dir ('/srv/images') {
         sh "docker-compose pull saltmaster saltminion"
         sh "docker-compose up -d saltmaster"
@@ -72,12 +72,23 @@ node {
 
     stage("State Synthax") {
       dir ('/srv/images') {
-        sh "docker-compose exec -T saltmaster bash -c \"\
+        // Copy mocked pillar
+        sh """
+        docker-compose exec -T saltmaster bash -c \"
+mkdir -p /srv/pillar/{prod,uat,qa,dev}/pods
+cp -f /srv/tests/unit/sym-es13-dev-chat-glb-1.sls /srv/pillar/prod/pods/
+cp -f /srv/tests/unit/sym-es13-dev-chat-glb-1.sls /srv/pillar/uat/pods/
+cp -f /srv/tests/unit/sym-es13-dev-chat-glb-1.sls /srv/pillar/qa/pods/
+cp -f /srv/tests/unit/sym-es13-dev-chat-glb-1.sls /srv/pillar/dev/pods/ \"
+        """
+        // Run state synthax test
+        sh """
+        docker-compose exec -T saltmaster bash -c \"
 source /root/.bash_profile && \
-cd /srv/tests && \
-export WHITELIST_TESTS=tests.unit.test_state_syntax.SaltWhitelistSyntaxTests && \
-export APPLY_TESTS=tests.unit.test_state_syntax.SaltApplyTests && \
-nosetests --verbose --nocapture --nologcapture --processes=4 --process-timeout=3600 --exclude-test=\${WHITELIST_TESTS} --exclude-test=\${APPLY_TESTS} unit/test_state_syntax.py\""
+nosetests --verbose --nocapture --nologcapture --processes=4 --process-timeout=3600 \
+--exclude-test=tests.unit.test_state_syntax.SaltWhitelistSyntaxTests \
+--exclude-test=tests.unit.test_state_syntax.SaltApplyTests /srv/tests/unit/test_state_syntax.py \"
+        """
       }
     }
   }
